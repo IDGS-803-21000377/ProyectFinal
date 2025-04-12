@@ -1,0 +1,105 @@
+{% extends "layout.html" %}
+{% block container %}
+<div class="max-w-7xl mx-auto rounded-3xl overflow-hidden shadow-lg bg-white">
+
+  <!-- Encabezado verde -->
+  <div class="bg-gradient-to-tr from-emerald-700 to-emerald-900 text-white py-6 px-8 text-center">
+    <h2 class="text-3xl font-bold">Producción de Recetas</h2>
+    <p class="text-sm">Selecciona una receta para generar galletas</p>
+
+    <!-- Alertas específicas de producción -->
+    <div id="alerts-container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            {% if category.startswith('produccion_') %}
+              <div class="mt-4 px-4 py-3 rounded text-sm text-white alert 
+                          {% if category == 'produccion_success' %}bg-green-600{% else %}bg-red-600{% endif %}">
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
+  </div>
+
+  {% if recetas %}
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+    {% for receta in recetas %}
+    <div class="bg-gray-50 p-5 rounded-lg shadow hover:shadow-lg transition-all duration-300">
+      <!-- Imagen -->
+      <div class="h-40 overflow-hidden rounded-lg mb-4">
+        {% if receta.imagen %}
+          <img src="{{ url_for('static', filename='uploads/' ~ receta.imagen) }}" alt="{{ receta.nombre }}" class="w-full h-full object-cover">
+        {% else %}
+          <div class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">Sin imagen</div>
+        {% endif %}
+      </div>
+
+      <!-- Información -->
+      <h3 class="text-lg font-semibold text-gray-800">{{ receta.nombre }}</h3>
+      <p class="text-sm text-gray-600 mt-2 mb-3">{{ receta.descripcion }}</p>
+
+      <h4 class="text-sm font-medium text-gray-700 mb-1">Ingredientes:</h4>
+      <ul class="list-disc list-inside text-sm text-gray-600 mb-4">
+        {% for ingrediente in receta.receta_ingredientes %}
+          <li>{{ ingrediente.materia_prima.nombre }}: {{ ingrediente.cantidad }} {{ ingrediente.materia_prima.unidad }}</li>
+        {% endfor %}
+      </ul>
+
+      <!-- Botón con SweetAlert -->
+      <form method="POST" action="{{ url_for('produccion.producir_receta', receta_id=receta.id) }}" class="produccion-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-md transition">
+          🍼 Producir Galletas
+        </button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <div class="text-center py-12 text-gray-500">
+      No hay recetas disponibles para producir.
+    </div>
+  {% endif %}
+</div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Confirmación de producción -->
+<script>
+  document.querySelectorAll('.produccion-form').forEach(form => {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: 'Se generarán 300 galletas para esta receta.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#007369',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, producir',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          form.submit();
+        }
+      });
+    });
+  });
+</script>
+
+<!-- Ocultar alertas después de 2 segundos -->
+<script>
+  setTimeout(function () {
+    document.querySelectorAll('.alert').forEach(function (el) {
+      el.style.transition = "opacity 0.5s ease";
+      el.style.opacity = 0;
+      setTimeout(() => el.remove(), 500);
+    });
+  }, 2000);
+</script>
+{% endblock %}

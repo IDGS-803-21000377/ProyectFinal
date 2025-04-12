@@ -1,0 +1,137 @@
+{% extends "layout.html" %}
+{% block container %}
+
+<div class="max-w-7xl mx-auto rounded-3xl overflow-hidden shadow-lg bg-white">
+
+  <!-- Encabezado verde -->
+  <div class="bg-gradient-to-tr from-emerald-700 to-emerald-900 text-white py-6 px-8 text-center">
+    <h2 class="text-3xl font-bold">Recetas Registradas</h2>
+    <p class="text-sm">Consulta, edita o elimina recetas de galletas</p>
+  </div>
+
+  <!-- Contenido -->
+  <div class="p-6">
+
+    {% if recetas.items %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for receta in recetas.items %}
+      <div class="bg-white rounded-xl shadow hover:shadow-lg transition-all duration-300 border border-gray-200">
+        <!-- Imagen -->
+        <div class="h-40 overflow-hidden rounded-t-xl">
+          {% if receta.imagen %}
+            <img src="{{ url_for('static', filename='uploads/' ~ receta.imagen) }}" alt="{{ receta.nombre }}" class="w-full h-full object-cover">
+          {% else %}
+            <div class="w-full h-full flex items-center justify-center text-gray-400 bg-gray-100">
+              Sin imagen
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Datos de la receta -->
+        <div class="p-5">
+          <h3 class="text-xl font-semibold text-gray-800 mb-1">{{ receta.nombre }}</h3>
+          <p class="text-sm text-gray-600 mb-3">{{ receta.descripcion }}</p>
+
+          <h4 class="text-sm font-medium text-gray-700 mb-2">Ingredientes:</h4>
+          <ul class="list-disc list-inside text-sm text-gray-600 space-y-1 mb-4">
+            {% for ingrediente in receta.receta_ingredientes %}
+              <li>{{ ingrediente.materia_prima.nombre }}: {{ ingrediente.cantidad }} {{ ingrediente.materia_prima.unidad }}</li>
+            {% endfor %}
+          </ul>
+
+          <!-- Botones -->
+          <div class="flex justify-between items-center mt-4">
+            <a href="{{ url_for('recetas.editar_receta', id=receta.id) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-sm transition">
+              Editar
+            </a>
+            <form method="POST" action="{{ url_for('recetas.eliminar_receta', id=receta.id) }}" class="inline delete-form">
+              <input type="hidden" name="csrf_token" value="{{ form.csrf_token._value() }}">
+              <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded text-sm transition">
+                Eliminar
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    <div class="mt-10 flex justify-center space-x-2">
+      {% if recetas.has_prev %}
+        <a href="{{ url_for('recetas.ver_recetas', page=recetas.prev_num) }}"
+          class="px-4 py-2 bg-white text-green-600 border border-green-600 rounded hover:bg-green-50">
+          &laquo; Anterior
+        </a>
+      {% endif %}
+
+      {% for page_num in recetas.iter_pages() %}
+        {% if page_num %}
+          <a href="{{ url_for('recetas.ver_recetas', page=page_num) }}"
+            class="px-4 py-2 {% if page_num == recetas.page %}bg-green-600 text-white{% else %}bg-white text-green-600 border border-green-600{% endif %} rounded hover:bg-green-50">
+            {{ page_num }}
+          </a>
+        {% else %}
+          <span class="px-4 py-2 text-gray-400">...</span>
+        {% endif %}
+      {% endfor %}
+
+      {% if recetas.has_next %}
+        <a href="{{ url_for('recetas.ver_recetas', page=recetas.next_num) }}"
+          class="px-4 py-2 bg-white text-green-600 border border-green-600 rounded hover:bg-green-50">
+          Siguiente &raquo;
+        </a>
+      {% endif %}
+    </div>
+
+    {% else %}
+    <div class="text-center py-12 text-gray-500 text-lg">
+      No hay recetas registradas aún.
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Alertas solo para recetas -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    {% if category.startswith('receta_') %}
+      <script>
+        Swal.fire({
+          icon: '{{ "success" if category == "receta_success" else "error" if category == "receta_error" else "info" }}',
+          title: '{{ "Éxito" if category == "receta_success" else "Error" if category == "receta_error" else "Información" }}',
+          text: '{{ message }}',
+          confirmButtonColor: '#007369'
+        });
+      </script>
+    {% endif %}
+  {% endfor %}
+{% endwith %}
+
+<!-- Confirmación personalizada para eliminar -->
+<script>
+  document.querySelectorAll('.delete-form').forEach(form => {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      Swal.fire({
+        title: '¿Eliminar receta?',
+        text: "Esta acción no se puede deshacer.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#aaa',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          form.submit();
+        }
+      });
+    });
+  });
+</script>
+
+{% endblock %}

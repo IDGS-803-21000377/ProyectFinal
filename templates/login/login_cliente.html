@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registro de Cliente | Gourmet Cookies</title>
+
+  <!-- Tailwind + Flowbite -->
+  <link href="https://cdn.jsdelivr.net/npm/flowbite@2.3.0/dist/flowbite.min.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flowbite@2.3.0/dist/flowbite.min.js"></script>
+
+  <!-- Fuente -->
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind personalizado -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            verdePanaderia: '#007369',
+            grisFondo: '#d3d0cf',
+            verdeClaro: '#e6f2ef',
+          },
+          fontFamily: {
+            sans: ['Quicksand', 'sans-serif']
+          },
+          boxShadow: {
+            logo: '0 4px 12px rgba(0, 0, 0, 0.3)',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-grisFondo font-sans flex items-center justify-center min-h-screen p-4">
+
+  <div class="w-full max-w-2xl bg-white border border-gray-200 rounded-3xl shadow-2xl ring-1 ring-gray-100 overflow-hidden transition duration-300">
+
+    <div class="px-10 py-8 bg-gradient-to-tr from-verdePanaderia to-emerald-900 text-white text-center">
+      <h2 class="text-3xl font-bold mb-2">Registro de Cliente</h2>
+      <p class="text-sm text-emerald-100">Completa todos los campos para crear tu cuenta</p>
+    </div>
+
+    <div class="p-8 bg-gray-50">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            {% if category in ['usuario_success', 'usuario_error'] %}
+              <div class="mb-4 px-4 py-2 rounded-md text-sm font-medium
+                {% if category == 'usuario_success' %}
+                  bg-green-100 text-green-800
+                {% else %}
+                  bg-red-100 text-red-800
+                {% endif %}">
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endwith %}  
+
+      <form action="{{ url_for('auth.registro_cliente') }}" method="POST" class="space-y-5" novalidate>
+        {{ form.hidden_tag() }}
+
+        <!-- Campo oculto para el rol -->
+        <input type="hidden" name="role" value="cliente">
+
+        <!-- Usuario -->
+        <div>
+          <label class="block text-sm font-semibold text-verdePanaderia">Nombre de usuario*</label>
+          <div class="relative mt-1">
+            {{ form.username(class_="pl-10 pr-4 py-2 w-full rounded-xl bg-verdeClaro border border-verdePanaderia/40 text-verdePanaderia focus:ring-verdePanaderia focus:border-verdePanaderia", placeholder="Ej: juan_perez") }}
+          </div>
+          {% for error in form.username.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-semibold text-verdePanaderia">Correo Electrónico*</label>
+          <div class="relative mt-1">
+            {{ form.email(class_="pl-10 pr-4 py-2 w-full rounded-xl bg-verdeClaro border border-verdePanaderia/40 text-verdePanaderia focus:ring-verdePanaderia focus:border-verdePanaderia", placeholder="Ej: cliente@correo.com") }}
+          </div>
+          {% for error in form.email.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <!-- Contraseña -->
+        <div>
+          <label class="block text-sm font-semibold text-verdePanaderia">Contraseña*</label>
+          <div class="relative mt-1">
+            {{ form.password(class_="pl-10 pr-4 py-2 w-full rounded-xl bg-verdeClaro border border-verdePanaderia/40 text-verdePanaderia focus:ring-verdePanaderia focus:border-verdePanaderia", placeholder="Mínimo 8 caracteres") }}
+          </div>
+          <p class="text-xs text-gray-500 mt-2">Debe tener una mayúscula y terminar con número.</p>
+          {% for error in form.password.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <!-- Nombre -->
+        <div>
+          <label class="block text-sm font-semibold text-verdePanaderia">Nombre*</label>
+          {{ form.name(class_="pl-10 pr-4 py-2 w-full rounded-xl bg-verdeClaro border border-verdePanaderia/40 text-verdePanaderia focus:ring-verdePanaderia focus:border-verdePanaderia", placeholder="Ej: Juan") }}
+          {% for error in form.name.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <!-- Apellido -->
+        <div>
+          <label class="block text-sm font-semibold text-verdePanaderia">Apellido*</label>
+          {{ form.last_name(class_="pl-10 pr-4 py-2 w-full rounded-xl bg-verdeClaro border border-verdePanaderia/40 text-verdePanaderia focus:ring-verdePanaderia focus:border-verdePanaderia", placeholder="Ej: Pérez") }}
+          {% for error in form.last_name.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <!-- Dirección -->
+        <div>
+          <label class="block text-sm font-semibold text-verdePanaderia">Dirección</label>
+          {{ form.address(class_="pl-10 pr-4 py-2 w-full rounded-xl bg-verdeClaro border border-verdePanaderia/40 text-verdePanaderia focus:ring-verdePanaderia focus:border-verdePanaderia", placeholder="Ej: Calle Principal #123") }}
+          {% for error in form.address.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <!-- Teléfono -->
+        <div>
+          <label class="block text-sm font-semibold text-verdePanaderia">Teléfono</label>
+          {{ form.phone_number(class_="pl-10 pr-4 py-2 w-full rounded-xl bg-verdeClaro border border-verdePanaderia/40 text-verdePanaderia focus:ring-verdePanaderia focus:border-verdePanaderia", placeholder="Ej: 5512345678") }}
+          {% for error in form.phone_number.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <!-- Botón -->
+        <div class="pt-4 flex flex-col items-center space-y-3">
+          <button type="submit" class="w-full text-white bg-verdePanaderia hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-semibold rounded-xl text-sm px-5 py-3 text-center transition duration-200 shadow-md">
+            Registrarse
+          </button>
+          <p class="text-sm text-gray-600">
+            ¿Ya tienes cuenta? <a href="{{ url_for('auth.login') }}" class="text-verdePanaderia hover:underline">Inicia sesión</a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

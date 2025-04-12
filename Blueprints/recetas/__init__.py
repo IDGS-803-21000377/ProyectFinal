@@ -1,2 +1,7 @@
+from flask import Blueprint
 
-from .routes import recetas_bp
+# Define el blueprint aquí (sin otras dependencias)
+recetas_bp = Blueprint('recetas', __name__)
+
+# Importa las rutas DESPUÉS de definir el blueprint
+from . import routes

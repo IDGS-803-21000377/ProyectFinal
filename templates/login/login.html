@@ -33,14 +33,17 @@
       }
     }
   </script>
+
+  <!-- reCAPTCHA -->
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 
 <body class="bg-grisFondo font-sans flex items-center justify-center min-h-screen">
 
   <!-- Contenedor del formulario -->
-  <div class="w-full max-w-md p-8 bg-white border border-gray-200 rounded-3xl shadow-2xl ring-1 ring-gray-100 transition duration-300">
+  <div class="w-full max-w-md p-6 bg-white border border-gray-200 rounded-3xl shadow-2xl ring-1 ring-gray-100 transition duration-300">
 
-    <!-- Logo con sombra -->
+    <!-- Logo -->
     <div class="flex justify-center mb-4">
       <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Panadería"
            class="h-60 w-auto rounded-full shadow-logo transition duration-300 hover:scale-105" />
@@ -50,38 +53,25 @@
     <h2 class="text-2xl font-bold text-center text-verdePanaderia mb-1">Bienvenido a Gourmet Cookies</h2>
     <p class="text-center text-sm text-gray-600 mb-6">Inicia sesión para continuar</p>
 
-<!-- Flash messages -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <div class="mb-4 space-y-2">
-      {% for category, message in messages %}
-        <div class="flash-message relative p-3 pr-10 text-sm text-white rounded-md shadow flex items-center justify-between transition-opacity duration-500
-                    {% if category == 'error' %} bg-red-500 {% elif category == 'success' %} bg-green-500 {% endif %}">
-          <span>{{ message }}</span>
-          <button type="button" class="absolute top-2 right-2 text-white hover:text-gray-200"
-                  onclick="this.parentElement.style.opacity = '0'; setTimeout(() => this.parentElement.remove(), 500)">
-            &times;
-          </button>
+    <!-- Notificaciones de login -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mb-4 space-y-2">
+          {% for category, message in messages %}
+            {% if category in ['login_error', 'login_success'] %}
+              <div class="flash-message text-sm text-center px-4 py-2 rounded-xl
+                          {% if category == 'login_success' %}
+                            bg-green-100 text-green-800
+                          {% else %}
+                            bg-red-100 text-red-800
+                          {% endif %}">
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
         </div>
-      {% endfor %}
-    </div>
-  {% endif %}
-{% endwith %}
-
-<!-- Auto-dismiss script -->
-<script>
-  // Auto-remove after 4 seconds
-  document.addEventListener("DOMContentLoaded", () => {
-    const messages = document.querySelectorAll(".flash-message");
-    messages.forEach(msg => {
-      setTimeout(() => {
-        msg.style.opacity = '0';
-        setTimeout(() => msg.remove(), 500); // wait for fade-out
-      }, 4000); // time before dismiss (ms)
-    });
-  });
-</script>
-
+      {% endif %}
+    {% endwith %}
 
     <!-- Formulario -->
     <form method="POST" action="{{ url_for('auth.login') }}" class="space-y-5">
@@ -89,14 +79,17 @@
 
       <div>
         <label for="username" class="block mb-1 text-sm font-semibold text-verdePanaderia">Nombre de usuario</label>
-        <input type="text" id="username" name="username" placeholder="Ingresa tu usuario"
-          class="bg-verdeClaro border border-verdePanaderia/40 text-verdePanaderia text-sm rounded-xl focus:ring-verdePanaderia focus:border-verdePanaderia block w-full p-2.5 shadow-sm" required>
+        {{ form.username(class="bg-verdeClaro border border-verdePanaderia/40 text-verdePanaderia text-sm rounded-xl focus:ring-verdePanaderia focus:border-verdePanaderia block w-full p-2.5 shadow-sm") }}
       </div>
 
       <div>
         <label for="password" class="block mb-1 text-sm font-semibold text-verdePanaderia">Contraseña</label>
-        <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña"
-          class="bg-verdeClaro border border-verdePanaderia/40 text-verdePanaderia text-sm rounded-xl focus:ring-verdePanaderia focus:border-verdePanaderia block w-full p-2.5 shadow-sm" required>
+        {{ form.password(class="bg-verdeClaro border border-verdePanaderia/40 text-verdePanaderia text-sm rounded-xl focus:ring-verdePanaderia focus:border-verdePanaderia block w-full p-2.5 shadow-sm") }}
+      </div>
+
+      <!-- reCAPTCHA -->
+      <div class="mb-4">
+        {{ form.recaptcha() }}
       </div>
 
       <button type="submit"
@@ -104,7 +97,26 @@
         Iniciar sesión
       </button>
     </form>
+
+    <!-- Botón de Crear Cuenta -->
+    <div class="mt-4 text-center">
+      <p class="text-sm text-gray-600 mb-2">¿No tienes una cuenta?</p>
+      <a href="{{ url_for('auth.registro_cliente') }}"
+         class="inline-block w-full text-verdePanaderia border border-verdePanaderia hover:bg-verdeClaro focus:ring-4 focus:outline-none focus:ring-emerald-200 font-semibold rounded-xl text-sm px-5 py-2.5 text-center transition duration-200">
+        Crear cuenta
+      </a>
+    </div>
   </div>
 
+  <!-- Autoocultar notificaciones -->
+  <script>
+    setTimeout(() => {
+      const alerts = document.querySelectorAll('.flash-message');
+      alerts.forEach(alert => {
+        alert.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+        setTimeout(() => alert.remove(), 500);
+      });
+    }, 2000);
+  </script>
 </body>
 </html>

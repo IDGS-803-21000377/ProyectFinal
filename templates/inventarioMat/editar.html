@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block container %}
+<div class="max-w-4xl mx-auto">
+  <h1 class="text-3xl font-bold text-principal mb-6">Editar Material</h1>
+  
+  <div class="bg-white rounded-lg shadow p-6">
+    <form method="POST">
+      {{ form.hidden_tag() }}
+      
+      <div class="grid grid-cols-1 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Nombre del Material</label>
+          {{ form.nombreProducto(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-principal focus:ring focus:ring-principal focus:ring-opacity-50") }}
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Proveedor</label>
+          {{ form.proveedor_id(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-principal focus:ring focus:ring-principal focus:ring-opacity-50") }}
+        </div>
+        
+        <div class="grid grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Cantidad</label>
+            {{ form.cantidad_disponible(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-principal focus:ring focus:ring-principal focus:ring-opacity-50") }}
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Unidad</label>
+            {{ form.unidad(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-principal focus:ring focus:ring-principal focus:ring-opacity-50") }}
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Precio por Unidad</label>
+          {{ form.precio_por_unidad(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-principal focus:ring focus:ring-principal focus:ring-opacity-50") }}
+        </div>
+        
+        <div class="flex justify-end space-x-4 pt-4">
+          <a href="{{ url_for('materiales.index') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+            Cancelar
+          </a>
+          <button type="submit" class="px-4 py-2 bg-principal text-white rounded-md hover:bg-emerald-800 transition">
+            Actualizar Material
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+{% block container %}
+
+<div class="max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-lg bg-white">
+
+  <!-- Encabezado verde -->
+  <div class="bg-gradient-to-tr from-emerald-700 to-emerald-900 text-white py-6 px-8 text-center">
+    <h2 class="text-3xl font-bold">Editar Usuario</h2>
+    <p class="text-sm">Modifica los datos del usuario seleccionado</p>
+  </div>
+
+  <!-- Formulario -->
+  <div class="p-8">
+    <form method="POST" action="{{ url_for('auth.editar_usuario', id=usuario.id_user) }}">
+      {{ form.hidden_tag() }}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Username -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Nombre de Usuario</label>
+          {{ form.username(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-principal focus:ring-principal") }}
+          {% for error in form.username.errors %}
+            <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <!-- Nombre -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Nombre</label>
+          {{ form.name(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-principal focus:ring-principal") }}
+          {% for error in form.name.errors %}
+            <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <!-- Apellido -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Apellido</label>
+          {{ form.last_name(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-principal focus:ring-principal") }}
+        </div>
+
+        <!-- Dirección -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Dirección</label>
+          {{ form.address(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-principal focus:ring-principal") }}
+        </div>
+
+        <!-- Teléfono -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Teléfono</label>
+          {{ form.phone_number(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-principal focus:ring-principal") }}
+        </div>
+
+        <!-- Rol -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Rol</label>
+          {{ form.role(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-principal focus:ring-principal") }}
+          {% for error in form.role.errors %}
+            <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <!-- Contraseña -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Nueva Contraseña (opcional)</label>
+          {{ form.password(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-principal focus:ring-principal") }}
+          {% for error in form.password.errors %}
+            <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+          {% endfor %}
+          <p class="mt-1 text-xs text-gray-500">
+            Deja en blanco si no deseas cambiarla. Debe contener al menos 8 caracteres, una mayúscula y terminar en número.
+          </p>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex justify-end space-x-4 mt-8">
+        <a href="{{ url_for('auth.listar_usuarios') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100">
+          Cancelar
+        </a>
+        <button type="submit" class="px-4 py-2 bg-principal text-white rounded-md hover:bg-emerald-800 transition">
+          Guardar Cambios
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

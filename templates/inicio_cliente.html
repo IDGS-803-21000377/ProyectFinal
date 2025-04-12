@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Recetas Disponibles | Gourmet Cookies</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <style>
+    .recipe-card:hover .recipe-image {
+      transform: scale(1.05);
+    }
+    .ingredient-chip {
+      transition: all 0.3s ease;
+    }
+    .ingredient-chip:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100">
+
+  <!-- Hero Section -->
+  <header class="relative bg-green-700 text-white py-16 overflow-hidden">
+    <div class="absolute inset-0 bg-black opacity-40"></div>
+    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1607013251379-e6aec68aa8a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center"></div>
+    
+    <div class="container mx-auto px-6 relative z-10 text-center">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4 animate__animated animate__fadeInDown">Nuestras Recetas Artesanales</h1>
+      <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto animate__animated animate__fadeIn animate__delay-1s">Descubre el sabor auténtico de nuestras creaciones gourmet</p>
+      <div class="animate__animated animate__fadeInUp animate__delay-2s">
+        <a href="#recetas" class="inline-block bg-white text-green-700 font-semibold px-8 py-3 rounded-full hover:bg-gray-100 transition duration-300 transform hover:scale-105">
+          Explorar Recetas
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Recetas Section -->
+  <section id="recetas" class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold text-green-800 mb-4">Nuestro Libro de Recetas</h2>
+      <div class="w-24 h-1 bg-green-600 mx-auto mb-6"></div>
+      <p class="text-gray-600 max-w-2xl mx-auto">Cada receta es cuidadosamente elaborada con ingredientes de la más alta calidad para ofrecerte una experiencia gastronómica única.</p>
+    </div>
+
+    <!-- Grid de Recetas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% if recetas.items %}
+          {% for receta in recetas.items %}
+          <div class="recipe-card bg-white rounded-xl overflow-hidden transition duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-2xl">
+              <!-- Imagen de la receta -->
+              <div class="overflow-hidden h-48 shadow-sm">
+                  {% if receta.imagen %}
+                  <img src="{{ url_for('static', filename='uploads/' ~ receta.imagen) }}" alt="{{ receta.nombre }}" class="w-full h-full object-cover">
+                  {% else %}
+                      <div class="w-full h-full bg-gray-100 flex items-center justify-center shadow-inner">
+                          <i class="fas fa-utensils text-gray-300 text-5xl"></i>
+                      </div>
+                  {% endif %}
+              </div>
+              
+              <!-- Contenido de la receta -->
+              <div class="p-6">
+                  <div class="flex justify-between items-start mb-3">
+                      <h3 class="text-xl font-bold text-green-800">{{ receta.nombre }}</h3>
+                      <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full shadow-sm">Nuevo</span>
+                  </div>
+                  
+
+                  
+                  <div class="mb-6">
+                      
+                      <div class="flex flex-wrap gap-2">
+                          {% for ingrediente in receta.ingredientes %}
+                          <span class="ingredient-chip bg-gray-50 text-gray-700 text-sm px-3 py-1 rounded-full shadow-xs border border-gray-100">
+                              {{ ingrediente.materia_prima.nombre }} ({{ ingrediente.cantidad }} {{ ingrediente.materia_prima.unidad }})
+                          </span>
+                          {% endfor %}
+                      </div>
+                  </div>
+                  
+                  <!-- Botón de favoritos con sombra y efecto hover -->
+                  <a href="{{ url_for('auth.login') }}" 
+                     class="inline-flex items-center justify-center w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
+                      <i class="fas fa-heart mr-2"></i> Comprar
+                  </a>
+              </div>
+          </div>
+          {% endfor %}
+      {% else %}
+          <div class="col-span-3 text-center py-12 bg-white rounded-xl shadow-lg p-8">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 class="text-xl font-medium text-gray-600 mb-2">No hay recetas disponibles</h3>
+              <p class="text-gray-500 max-w-md mx-auto">Actualmente no tenemos recetas para mostrar, pero estamos trabajando en nuevas creaciones para ti.</p>
+          </div>
+      {% endif %}
+  </div>
+
+    <!-- Paginación -->
+    <div class="mt-8 flex justify-center">
+      {% if recetas.has_prev %}
+      <a href="{{ url_for('recetas.lista_recetas_cliente', page=recetas.prev_num) }}" 
+         class="px-4 py-2 mx-1 bg-white text-green-600 border border-green-600 rounded hover:bg-green-50">
+          &laquo; Anterior
+      </a>
+      {% endif %}
+      
+      {% for page_num in recetas.iter_pages() %}
+          {% if page_num %}
+              <a href="{{ url_for('recetas.lista_recetas_cliente', page=page_num) }}" 
+                 class="px-4 py-2 mx-1 {% if page_num == recetas.page %}bg-green-600 text-white{% else %}bg-white text-green-600 border border-green-600{% endif %} rounded hover:bg-green-50">
+                  {{ page_num }}
+              </a>
+          {% else %}
+              <span class="px-4 py-2 mx-1">...</span>
+          {% endif %}
+      {% endfor %}
+      
+      {% if recetas.has_next %}
+      <a href="{{ url_for('recetas.lista_recetas_cliente', page=recetas.next_num) }}" 
+         class="px-4 py-2 mx-1 bg-white text-green-600 border border-green-600 rounded hover:bg-green-50">
+          Siguiente &raquo;
+      </a>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+
+  <footer class="bg-gray-800 text-white py-12">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <h3 class="text-xl font-bold mb-4">Gourmet Cookies</h3>
+          <p class="text-gray-400">Delicias artesanales hechas con amor y los mejores ingredientes.</p>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold mb-4">Contacto</h4>
+          <ul class="space-y-2 text-gray-400">
+            <li>gourmetcookies654@gmail.com</li>
+            <li>+52 477 828-3293</li>
+            <li>Blvd. Universidad Tecnológica 225, Universidad Tecnologica, San Carlos la Roncha, 37670 León de los Aldama, Gto.</li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold mb-4">Síguenos</h4>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-white transition">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd"></path></svg>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd"></path></svg>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+        <p>&copy; 2025 Gourmet Cookies. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Animación al hacer scroll
+    document.addEventListener('DOMContentLoaded', function() {
+      const recipeCards = document.querySelectorAll('.recipe-card');
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate__animated', 'animate__fadeInUp');
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      recipeCards.forEach(card => {
+        observer.observe(card);
+      });
+    });
+  </script>
+</body>
+</html>

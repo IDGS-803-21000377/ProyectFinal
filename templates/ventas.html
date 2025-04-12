@@ -1,0 +1,197 @@
+{% extends "layout.html" %}
+{% block container %}
+
+<!-- CONTENEDOR PRINCIPAL -->
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+
+  <!-- COLUMNA: FORMULARIO Y VENTAS REALIZADAS -->
+  <div class="md:col-span-2 space-y-8">
+
+    <!-- REGISTRO DE VENTA -->
+    <div class="bg-white rounded-3xl shadow-lg overflow-hidden">
+      <div class="bg-gradient-to-tr from-emerald-700 to-emerald-900 text-white py-6 px-8 text-center">
+        <h2 class="text-3xl font-bold">Registrar Venta</h2>
+        <p class="text-sm">Agrega productos terminados para generar una nueva venta</p>
+      </div>
+
+      <div class="p-8 border-b border-gray-200">
+        <form action="{{ url_for('ventas.save') }}" method="POST">
+          {{ form.csrf_token }}
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Galleta:</label>
+              <select name="producto_terminado" required
+                class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-principal focus:ring-principal">
+                <option value="">-- Selecciona una galleta --</option>
+                {% for producto in productos %}
+                <option value="{{ producto.id }}">{{ producto.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Presentación:</label>
+              <select name="presentacion" required
+                class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-principal focus:ring-principal">
+                <option value="paquete">Paquete</option>
+                <option value="caja">Caja</option>
+                <option value="individual">Individual</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Cantidad:</label>
+              <input type="number" min="1" name="cantidad" required
+                class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-principal focus:ring-principal">
+            </div>
+          </div>
+
+          <div class="mt-6 text-right">
+            <button type="submit"
+              class="bg-principal text-white py-2 px-6 rounded-lg hover:bg-emerald-800 transition">
+              Agregar
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="px-8 pb-8">
+        {% if registros %}
+        <table class="min-w-full divide-y divide-gray-200 mt-4 shadow-sm rounded-lg overflow-hidden bg-white">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Galleta</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Presentación</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Cantidad</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Sub Total</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            {% for registro in registros %}
+            <tr>
+              <td class="px-6 py-4 text-sm">{{ registro.producto_terminado }}</td>
+              <td class="px-6 py-4 text-sm">{{ registro.presentacion }}</td>
+              <td class="px-6 py-4 text-sm">{{ registro.cantidad }}</td>
+              <td class="px-6 py-4 text-sm">${{ registro.subtotal }}</td>
+              <td class="px-6 py-4">
+                <form action="{{ url_for('ventas.delete') }}" method="POST" class="inline">
+                  {{ form.csrf_token }}
+                  <input type="hidden" name="id" value="{{ loop.index }}">
+                  <button type="submit" class="text-red-600 hover:text-red-800 font-medium">Quitar</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <form id="formCargarVentas" action="{{ url_for('ventas.realizar_venta') }}" method="POST" class="mt-6">
+          {{ form.csrf_token }}
+          <button type="submit"
+            class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-semibold">
+            Terminar Venta
+          </button>
+        </form>
+        {% else %}
+        <p class="text-center text-gray-500 mt-6">Aún no hay productos en esta venta.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- VENTAS REALIZADAS -->
+    <div class="bg-white shadow-xl rounded-2xl border-t-4 border-emerald-500 p-6">
+      <h2 class="text-xl font-bold text-emerald-700 mb-4 text-center">Ventas Realizadas</h2>
+
+      <div class="overflow-x-auto rounded-lg max-h-[350px]">
+        <table class="min-w-full divide-y divide-gray-200 text-sm text-center">
+          <thead class="bg-emerald-50 text-xs text-emerald-800 font-semibold uppercase">
+            <tr>
+              <th class="px-4 py-2">🍪 Galleta</th>
+              <th class="px-4 py-2">🎁 Presentación</th>
+              <th class="px-4 py-2">🔢 Cantidad</th>
+              <th class="px-4 py-2">💵 Subtotal</th>
+              <th class="px-4 py-2">📆 Fecha</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-100">
+            {% for venta, detalle, producto in ventas_realizadas %}
+            <tr class="hover:bg-emerald-50 transition-all">
+              <td class="px-4 py-2 font-medium text-gray-800">{{ producto.nombre }}</td>
+              <td class="px-4 py-2 text-gray-700">{{ detalle.presentacion }}</td>
+              <td class="px-4 py-2 text-gray-700">{{ detalle.cantidad }}</td>
+              <td class="px-4 py-2 text-green-600 font-semibold">${{ detalle.subtotal }}</td>
+              <td class="px-4 py-2 text-gray-500">{{ venta.fechaVenta.strftime('%d/%m/%Y') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- COLUMNA: ENTREGAS PENDIENTES -->
+  <div class="bg-white rounded-3xl shadow-lg p-6 border border-gray-200 h-fit">
+    <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">Entregas Pendientes</h2>
+
+    {% if detalles %}
+    <div class="max-h-[500px] overflow-y-auto space-y-4">
+      {% for detalle in detalles %}
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-300">
+        <p><strong>Galleta:</strong> {{ detalle.producto_terminado.nombre }}</p>
+        <p><strong>Presentación:</strong> {{ detalle.presentacion }}</p>
+        <p><strong>Cantidad:</strong> {{ detalle.cantidad }}</p>
+        <p><strong>Subtotal:</strong> ${{ detalle.subtotal | round(2) }}</p>
+        <p><strong>Fecha de Recolección:</strong> {{ detalle.pedido.fecha_recoleccion }}</p>
+
+        <form method="POST" action="{{ url_for('ventas.realizar_venta_pedido') }}" class="mt-2">
+          {{ form.csrf_token }}
+          <input type="hidden" name="id" value="{{ loop.index }}">
+          <input type="hidden" name="idPedido" value="{{ detalle.pedido.idPedido }}">
+          <button type="submit"
+            class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition">
+            Finalizar Venta
+          </button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-gray-500 text-center">No hay pedidos pendientes.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Flash Messages con SweetAlert2 -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      {% if category == 'danger' %}
+        <script>
+          Swal.fire({
+            icon: 'error',
+            title: 'Galletas insuficientes',
+            text: '{{ message }}',
+            confirmButtonColor: '#d33'
+          });
+        </script>
+      {% elif category == 'success' %}
+        <script>
+          Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: '{{ message }}',
+            confirmButtonColor: '#007369'
+          });
+        </script>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+
+{% endblock %}

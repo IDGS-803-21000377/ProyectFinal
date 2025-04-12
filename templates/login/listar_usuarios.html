@@ -1,0 +1,137 @@
+{% extends "layout.html" %}
+{% block container %}
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="max-w-6xl mx-auto rounded-3xl overflow-hidden shadow-lg bg-white">
+
+  <!-- Encabezado verde -->
+  <div class="bg-gradient-to-tr from-emerald-700 to-emerald-900 text-white py-6 px-8 text-center">
+    <h2 class="text-3xl font-bold">Usuarios Registrados</h2>
+    <p class="text-sm">Administra, edita o elimina los usuarios del sistema</p>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="p-8">
+
+    <!-- Mensajes Flash Solo Para Esta Vista -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          {% if category in ['usuario_success', 'usuario_error', 'error_usuarios', 'success', 'error'] %}
+            <div class="mb-4 px-4 py-2 rounded-md text-sm font-medium
+              {% if category.endswith('success') %} bg-green-100 text-green-800
+              {% elif category.endswith('error') %} bg-red-100 text-red-800
+              {% else %} bg-yellow-100 text-yellow-800 {% endif %}">
+              {{ message }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Buscador y Botón -->
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+      <div class="relative w-full md:w-1/2">
+        <input type="text" id="busquedaUsuarios" placeholder="Buscar por nombre, usuario, dirección, etc..."
+               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:border-principal focus:ring-principal">
+        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.65 12.65z"/>
+          </svg>
+        </div>
+      </div>
+
+      <a href="{{ url_for('auth.crear_usuario') }}" 
+         class="bg-principal hover:bg-emerald-800 text-white font-medium py-2 px-4 rounded-lg transition flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+        </svg>
+        Nuevo Usuario
+      </a>
+    </div>
+
+    <!-- Tabla -->
+    <div class="bg-white rounded-lg shadow overflow-x-auto">
+      {% if usuarios %}
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usuario</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dirección</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teléfono</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rol</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          {% for usuario in usuarios %}
+          <tr class="fila-usuario">
+            <td class="px-6 py-4 whitespace-nowrap">{{ usuario.username }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ usuario.name }} {{ usuario.last_name }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ usuario.address or '—' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ usuario.phone_number or '—' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap capitalize">{{ usuario.role }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-right">
+              <a href="{{ url_for('auth.editar_usuario', id=usuario.id_user) }}" 
+                 class="text-principal hover:text-emerald-800 mr-4">Editar</a>
+              <form method="POST" action="{{ url_for('auth.eliminar_usuario', id=usuario.id_user) }}" class="inline eliminar-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" 
+                        class="text-red-600 hover:text-red-800 btn-eliminar">
+                  Eliminar
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="p-6 text-center text-gray-500">
+        No hay usuarios registrados.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Buscador -->
+<script>
+  document.getElementById('busquedaUsuarios').addEventListener('input', function () {
+    const filtro = this.value.toLowerCase();
+    const filas = document.querySelectorAll('.fila-usuario');
+    filas.forEach(fila => {
+      const textoFila = fila.innerText.toLowerCase();
+      fila.style.display = textoFila.includes(filtro) ? '' : 'none';
+    });
+  });
+</script>
+
+<!-- Confirmación SweetAlert al eliminar -->
+<script>
+  document.querySelectorAll('.eliminar-form').forEach(form => {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Esta acción eliminará al usuario permanentemente.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          form.submit();
+        }
+      });
+    });
+  });
+</script>
+
+{% endblock %}

@@ -1,11 +1,316 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
-</html>
+{% extends "layout.html" %}
+{% block container %}
+
+<div class="max-w-7xl mx-auto px-4 ">
+  <div class="text-center mb-10">
+    <h1 class="text-3xl font-bold text-gray-800">Dashboard de Ventas</h1>
+    <p class="text-gray-500 text-sm">Resumen general de ventas, productos y presentaciones más vendidas</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+      <h5 class="text-lg font-semibold text-gray-700 mb-2">Ventas del Día</h5>
+      <p class="text-3xl font-bold text-principal">${{ ventas_dia }}</p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+      <h5 class="text-lg font-semibold text-gray-700 mb-2">Presentaciones Más Vendidas</h5>
+      <ul class="space-y-2 mt-2">
+        {% if presentaciones_vendidas %}
+        {% for presentacion, total in presentaciones_vendidas %}
+        <li class="text-gray-700"><span class="font-semibold">{{ presentacion }}</span>: {{ total }} vendidos</li>
+        {% endfor %}
+        {% else %}
+        <li class="text-gray-500">No hay presentaciones vendidas hoy.</li>
+        {% endif %}
+      </ul>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+      <h5 class="text-lg font-semibold text-gray-700 mb-2">Productos Más Vendidos</h5>
+      <ul class="space-y-2 mt-2">
+        {% if productos_vendidos %}
+        {% for producto, total in productos_vendidos %}
+        <li class="text-gray-700"><span class="font-semibold">{{ producto }}</span>: {{ total }} vendidos</li>
+        {% endfor %}
+        {% else %}
+        <li class="text-gray-500">No hay productos vendidos hoy.</li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-white rounded-2xl shadow-lg dark:bg-gray-800 p-6 border dark:border-gray-700">
+      <div class="flex justify-between mb-5">
+        <div>
+          <h5 class="leading-none text-3xl font-bold text-gray-900 dark:text-white pb-2">${{ ventas_totales }}</h5>
+          <p class="text-base font-normal text-gray-500 dark:text-blue-400">Ventas Totales</p>
+        </div>
+        <div
+          class="flex items-center px-2.5 py-0.5 text-base font-semibold text-green-500 dark:text-green-500 text-center">
+        </div>
+      </div>
+      <div id="tooltip-chart"></div>
+      <div class="grid grid-cols-1 border-gray-200 border-t dark:border-gray-700 justify-between mt-5">
+        
+      </div>
+    </div>
+
+    <div class="max-w-sm w-full bg-white rounded-lg shadow-sm dark:bg-gray-800 p-4 md:p-6">
+      <div class="flex justify-center items-center w-full">
+        <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">Presentaciones más vendidas</h5>
+      </div>
+      <div class="flex justify-center items-center mt-4">
+        <div id="pie-chart"></div>
+      </div>
+    </div>
+
+    <div class="max-w-sm w-full bg-white rounded-lg shadow-sm dark:bg-gray-800 p-4 md:p-6">
+      <div class="flex justify-center items-center w-full">
+        <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">Productos más vendidos</h5>
+      </div>
+      <div class="flex justify-center items-center mt-4">
+        <div id="bar-chart"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.46.0/dist/apexcharts.min.js"></script>
+  <script>
+    const fechas = JSON.parse('{{ fechas | tojson | escape }}');
+    const ventasPorFecha = JSON.parse('{{ ventas_por_fecha | tojson | default("[]") | safe }}');
+    console.log(ventasPorFecha);
+
+    const areaChartOptions = {
+      tooltip: {
+        enabled: true,
+        x: { show: true },
+        y: { show: true },
+        style: {
+          fontSize: '12px',
+          color: '#FFFFFF',
+        },
+      },
+      grid: {
+        show: false,
+        strokeDashArray: 4,
+        padding: { left: 2, right: 2, top: -26 },
+      },
+      series: [{
+        name: "Ventas",
+        data: ventasPorFecha,
+        color: "#1A56DB",
+      }],
+      chart: {
+        height: "100%",
+        maxWidth: "100%",
+        type: "area",
+        fontFamily: "Inter, sans-serif",
+        dropShadow: { enabled: false },
+        toolbar: { show: false },
+      },
+      legend: {
+        show: true,
+        labels: {
+          colors: ['#FFFFFF'],
+        },
+      },
+      fill: {
+        type: "gradient",
+        gradient: {
+          opacityFrom: 0.55,
+          opacityTo: 0,
+          shade: "#1C64F2",
+          gradientToColors: ["#1C64F2"],
+        },
+      },
+      dataLabels: {
+        enabled: false
+      },
+      stroke: { width: 6 },
+      xaxis: {
+        categories: fechas,
+        labels: {
+          show: true,
+          style: {
+            fontSize: '12px',
+            colors: ['#FFFFFF'],
+          },
+        },
+        axisBorder: { show: false },
+        axisTicks: { show: false },
+      },
+      yaxis: {
+        show: true,
+        labels: {
+          formatter: function (value) {
+            return '$' + value;
+          },
+          style: {
+            colors: ['#FFFFFF'],
+          },
+        },
+      },
+    };
+
+    if (document.getElementById("tooltip-chart") && typeof ApexCharts !== 'undefined') {
+      const areaChart = new ApexCharts(document.getElementById("tooltip-chart"), areaChartOptions);
+      areaChart.render();
+    }
+
+    // GRAFICO DE PASTEL
+    const presentacionesPorcentaje = JSON.parse('{{ presentaciones_porcentaje | tojson | escape }}');
+
+    const series = presentacionesPorcentaje.map(p => parseFloat(p.porcentaje));  
+    const labels = presentacionesPorcentaje.map(p => p.presentacion);
+
+    const getChartOptions = () => {
+      return {
+        series: series,
+        labels: labels,
+        colors: ["#1C64F2", "#16BDCA", "#9061F9", "#FFB500", "#32A88E"],
+        chart: {
+          height: 420,
+          width: "100%",
+          type: "donut",
+        },
+        legend: {
+          position: 'bottom',
+          horizontalAlign: 'center',
+          fontSize: '20px',
+          labels: {
+            colors: ['#333'],
+          }
+        },
+        stroke: {
+          colors: ["white"],
+        },
+        plotOptions: {
+          pie: {
+            expandOnClick: true,
+            donut: {
+              size: '70%',
+            },
+            labels: {
+              show: true,
+              name: {
+                show: true,
+                fontSize: '20px',
+                fontWeight: 'bold',
+                color: '#333',
+              },
+              value: {
+                show: true,
+                fontSize: '20px',
+                color: '#666',
+              },
+            },
+          },
+        },
+        dataLabels: {
+          enabled: true,
+          style: {
+            fontFamily: "Inter, sans-serif",
+          },
+        },
+        tooltip: {
+          enabled: true,
+          custom: function ({ seriesIndex, w }) {
+            return `<div class="tooltip-custom">
+          <strong>${w.globals.labels[seriesIndex]}</strong>: ${w.globals.series[seriesIndex]}%
+          </div>`;
+          },
+        },
+      };
+    };
+
+    if (document.getElementById("pie-chart") && typeof ApexCharts !== 'undefined') {
+      const pieChart = new ApexCharts(document.getElementById("pie-chart"), getChartOptions());
+      pieChart.render();
+    }
+
+    //GRAFICO DE BARRAS
+    const productos_vendidos_datas = JSON.parse('{{ productos_vendidos_datas | tojson | escape }}');
+
+    const barraSeries = [{
+      name: 'Productos Vendidos',
+      data: productos_vendidos_datas.map(p => parseFloat(p.total_vendidos))
+    }];
+    const barraLabels = productos_vendidos_datas.map(p => p.nombre);
+
+    const getBarraChartOptions = () => {
+      return {
+        series: barraSeries, 
+        chart: {
+          height: 420,
+          type: 'bar',
+          width: '100%',
+        },
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            columnWidth: '55%',
+            endingShape: 'rounded',
+          },
+        },
+        colors: ["#1C64F2", "#16BDCA", "#9061F9", "#FFB500", "#32A88E"],
+        dataLabels: {
+          enabled: false,  
+        },
+        tooltip: {
+          enabled: true,
+          custom: function ({ seriesIndex, dataPointIndex, w }) {
+            const product = w.globals.labels[dataPointIndex];
+            const total = w.globals.series[seriesIndex][dataPointIndex];
+            return `<div class="tooltip-custom">
+          <strong>${product}</strong>: ${total} vendidos
+        </div>`;
+          },
+        },
+
+        xaxis: {
+          categories: barraLabels,
+          labels: {
+            style: {
+              fontSize: '14px',
+              colors: ['#FFFFFF'],
+            },
+          },
+        },
+        yaxis: {
+          title: {
+            text: 'Cantidad de productos vendidos',
+            style: {
+              color: '#FFFFFF',
+            },
+          },
+          labels: {
+            style: {
+              colors: ['#FFFFFF'],
+            },
+          },
+        },
+        legend: {
+          position: 'top',
+          horizontalAlign: 'center',
+          fontSize: '14px',
+          labels: {
+            colors: ['#FFFFFF'],
+          },
+        },
+        grid: {
+          borderColor: '#FFFFFF',
+        },
+      };
+    };
+
+    if (document.getElementById("bar-chart") && typeof ApexCharts !== 'undefined') {
+      const barChart = new ApexCharts(document.getElementById("bar-chart"), getBarraChartOptions());
+      barChart.render();
+    }
+
+  </script>
+  {% endblock %}

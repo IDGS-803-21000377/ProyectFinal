@@ -6,8 +6,15 @@
   <!-- Mensaje de bienvenida -->
   <div class="text-center md:text-left max-w-xl">
     <h1 class="text-4xl font-bold text-principal mb-4">¡Hola, {{ current_user.username }}!</h1>
+
+    {% if current_user.last_login %}
+      <p class="text-sm text-gray-500 mb-4">
+        Último acceso: {{ current_user.last_login.strftime('%d/%m/%Y %H:%M:%S') }}
+      </p>
+    {% endif %}
+
     <p class="text-lg text-gray-700">
-      Esperamos que tengas un excelente día en <span class="font-semibold text-principal">Galletas Gourmet</span>.
+      Esperamos que tengas un excelente día en <span class="font-semibold text-principal">Gourmet Cookies</span>.
       <br>
       Gracias por formar parte de nuestro equipo. ❤️<br>
       Tu dedicación mantiene viva la tradición de lo artesanal.
@@ -20,7 +27,6 @@
       src="https://imgs.search.brave.com/h6_MDwFDQrgmY-Rmhp1jNVdk-ryEvIIyZ7D0uyLmcQs/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5pc3RvY2twaG90/by5jb20vaWQvMTM4/NjczMjM2OS9lcy9m/b3RvL2dhbGxldGEt/Y29uLWNoaXNwYXMt/ZGUtY2hvY29sYXRl/LWZsb3RhbmRvLXNv/YnJlLXVuLWZvbmRv/LXZlcmRlLmpwZz9z/PTYxMng2MTImdz0w/Jms9MjAmYz1ndlQ0/a2hWNlpUbDdYMmJ4/SU1YWjlNNUFyeUZv/cG52aHc3OFY0UU52/azZRPQ"
       alt="Panadería artesanal"
       class="rounded-xl shadow-2xl w-full object-cover border border-gray-200"
-
     >
   </div>
 

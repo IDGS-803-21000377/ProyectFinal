@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pedidos del Cliente</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            principal: '#008C72'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#d4f5ec] min-h-screen text-gray-800 font-sans">
+
+  <!-- Encabezado simple -->
+  <header class="bg-white shadow py-4 px-8 flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-principal">Gourmet Cookies</h1>
+    <a href="/logout"
+       class="text-white bg-principal hover:bg-emerald-800 px-4 py-2 rounded-md transition">
+      Cerrar sesión
+    </a>
+  </header>
+
+  <main class="container mx-auto px-4 py-10 flex flex-col gap-10">
+    <!-- Formulario -->
+    <div class="bg-white rounded-xl shadow p-6">
+      <h2 class="text-xl font-bold text-emerald-800 mb-4">Agregar Pedido</h2>
+      <form action="{{ url_for('pedidos.save') }}" method="POST" class="space-y-6">
+        {{ form.csrf_token }}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Galleta</label>
+            <select name="producto_terminado" required
+              class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-principal focus:border-principal">
+              <option value="">-- Selecciona una --</option>
+              {% for producto in productos %}
+              <option value="{{ producto.id }}">{{ producto.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Presentación</label>
+            <select name="presentacion" required
+              class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-principal focus:border-principal">
+              <option value="paquete">Paquete</option>
+              <option value="caja">Caja</option>
+              <option value="individual">Individual</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Cantidad</label>
+            <input name="cantidad" type="number" min="1" required
+              class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-principal focus:border-principal">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Fecha de Recolección</label>
+            <input name="fecha_recoleccion" type="date" required
+              class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-principal focus:border-principal">
+          </div>
+          <div>
+            <button type="submit"
+              class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-md transition">
+              Agregar al Pedido
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Tabla de pedidos -->
+    <div class="bg-white rounded-xl shadow p-6">
+      <h2 class="text-xl font-bold text-emerald-800 mb-4">Resumen del Pedido</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase">Galleta</th>
+              <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase">Presentación</th>
+              <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase">Cantidad</th>
+              <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase">Fecha</th>
+              <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase">Subtotal</th>
+              <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {% for registro in registros %}
+            <tr>
+              <td class="px-6 py-4">{{ registro.producto_terminado }}</td>
+              <td class="px-6 py-4">{{ registro.presentacion }}</td>
+              <td class="px-6 py-4">{{ registro.cantidad }}</td>
+              <td class="px-6 py-4">{{ registro.fecha_recoleccion }}</td>
+              <td class="px-6 py-4">${{ registro.subtotal }}</td>
+              <td class="px-6 py-4">
+                <form action="{{ url_for('pedidos.delete') }}" method="POST">
+                  {{ form.csrf_token }}
+                  <input type="hidden" name="id" value="{{ loop.index }}">
+                  <button type="submit"
+                    class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition text-sm">Quitar</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <form action="{{ url_for('pedidos.cargar_pedidos') }}" method="POST" class="pt-4">
+        {{ form.csrf_token }}
+        <button type="submit"
+          class="w-full bg-principal hover:bg-emerald-800 text-white py-2 rounded-md transition">
+          Terminar Pedido
+        </button>
+      </form>
+    </div>
+
+    <!-- Entregas Pendientes -->
+    <div class="bg-white rounded-xl shadow p-6">
+      <h2 class="text-xl font-bold text-emerald-800 mb-4">Entregas Pendientes</h2>
+      {% if detalles %}
+      <ul class="space-y-3 max-h-96 overflow-y-auto pr-2">
+        {% for detalle in detalles %}
+        <li class="bg-gray-50 border border-gray-300 p-3 rounded-lg text-sm">
+          <p><strong>Galleta:</strong> {{ detalle.producto_terminado.nombre }}</p>
+          <p><strong>Presentación:</strong> {{ detalle.presentacion }}</p>
+          <p><strong>Cantidad:</strong> {{ detalle.cantidad }}</p>
+          <p><strong>Subtotal:</strong> ${{ detalle.subtotal | round(2) }}</p>
+          <p><strong>Recolección:</strong> {{ detalle.pedido.fecha_recoleccion.strftime('%d/%m/%Y') }}</p>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="text-gray-500">No hay entregas pendientes.</p>
+      {% endif %}
+    </div>
+  </main>
+</body>
+</html>

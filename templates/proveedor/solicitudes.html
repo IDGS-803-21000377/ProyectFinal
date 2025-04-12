@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+{% block container %}
+
+<div class="max-w-6xl mx-auto rounded-3xl overflow-hidden shadow-lg bg-white">
+
+  <!-- Encabezado -->
+  <div class="bg-gradient-to-tr from-emerald-700 to-emerald-900 text-white py-6 px-8 text-center">
+    <h2 class="text-3xl font-bold">Solicitudes de Material</h2>
+    <p class="text-sm">Visualiza y atiende las solicitudes generadas desde el inventario</p>
+  </div>
+
+  <!-- Contenido -->
+  <div class="p-8">
+    {% if solicitudes %}
+      <div class="overflow-x-auto rounded-lg shadow">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Material</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Cantidad</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Unidad</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Proveedor</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Acción</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {% for solicitud in solicitudes %}
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ solicitud.nombre }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ solicitud.cantidad }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ solicitud.unidad }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ solicitud.proveedor.nombre }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <form method="POST" action="{{ url_for('materiales.pedir_material', id=solicitud.id) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="bg-principal text-white px-4 py-1 rounded hover:bg-emerald-700 transition">
+                    Pedir
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="text-center mt-10 text-gray-500 text-lg">
+        No hay solicitudes pendientes por atender.
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Alertas SweetAlert solo para materiales -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    {% if category.startswith('material_') %}
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          Swal.fire({
+            icon: '{{ "success" if category == "material_success" else "error" }}',
+            title: '{{ "Éxito" if category == "material_success" else "Error" }}',
+            text: '{{ message }}',
+            confirmButtonColor: '#007369'
+          });
+        });
+      </script>
+    {% endif %}
+  {% endfor %}
+{% endwith %}
+
+{% endblock %}

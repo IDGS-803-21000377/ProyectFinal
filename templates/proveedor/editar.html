@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block container %}
+<div class="max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-lg bg-white">
+
+  <!-- Encabezado verde -->
+  <div class="bg-gradient-to-tr from-emerald-700 to-emerald-900 text-white py-6 px-8 text-center">
+    <h2 class="text-3xl font-bold">Editar Proveedor</h2>
+    <p class="text-sm">Modifica los datos necesarios y guarda los cambios</p>
+  </div>
+
+  <!-- Contenido del formulario -->
+  <div class="p-8">
+    <form method="POST" action="{{ url_for('proveedores.editar_proveedor', id=proveedor.id) }}">
+      {{ form.hidden_tag() }}
+
+      <div class="grid grid-cols-1 gap-6">
+        <!-- Nombre -->
+        <div>
+          <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre del Proveedor</label>
+          {{ form.nombre(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-principal focus:ring-principal") }}
+          {% for error in form.nombre.errors %}
+            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <!-- Dirección -->
+        <div>
+          <label for="direccion" class="block text-sm font-medium text-gray-700">Dirección</label>
+          {{ form.direccion(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-principal focus:ring-principal") }}
+        </div>
+
+        <!-- Teléfono -->
+        <div>
+          <label for="telefono" class="block text-sm font-medium text-gray-700">Teléfono</label>
+          {{ form.telefono(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-principal focus:ring-principal") }}
+        </div>
+
+        <!-- Botones -->
+        <div class="flex justify-end space-x-4 pt-4">
+          <a href="{{ url_for('proveedores.listar_proveedores') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+            Cancelar
+          </a>
+          <button type="submit" class="px-4 py-2 bg-principal text-white rounded-md hover:bg-emerald-800 transition">
+            Actualizar Proveedor
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

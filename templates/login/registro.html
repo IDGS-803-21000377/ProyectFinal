@@ -1,0 +1,122 @@
+{% extends "layout.html" %}
+{% block container %}
+
+<div class="max-w-2xl mx-auto mt-10 bg-white rounded-3xl shadow-2xl overflow-hidden">
+  <div class="px-10 py-8 bg-gradient-to-tr from-emerald-700 to-emerald-900 text-white text-center">
+    <h2 class="text-3xl font-bold mb-2">Registro de Usuario</h2>
+    <p class="text-sm text-emerald-100">Completa todos los campos para crear un nuevo usuario</p>
+  </div>
+
+  <div class="p-8 bg-gray-100">
+    <!-- Mensajes flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        {% if category in ['usuario_success', 'usuario_error'] %}
+          <div class="mb-4 px-4 py-2 rounded-md text-sm font-medium
+            {% if category == 'usuario_success' %}
+              bg-green-100 text-green-800
+            {% else %}
+              bg-red-100 text-red-800
+            {% endif %}">
+            {{ message }}
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endwith %}  
+
+    <form action="{{ url_for('auth.crear_usuario') }}" method="POST" class="space-y-5" novalidate>
+      {{ form.hidden_tag() }}
+
+      <!-- Usuario -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Nombre de usuario</label>
+        <div class="relative mt-1">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A9.003 9.003 0 0012 21a9.003 9.003 0 006.879-3.196M15 10a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </span>
+          {{ form.username(class_="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:ring-emerald-600 focus:border-emerald-600") }}
+        </div>
+        {% for error in form.username.errors %}
+          <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Contraseña -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Contraseña</label>
+        <div class="relative mt-1">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0-.552.224-1.05.586-1.414A2 2 0 0115 11v2a2 2 0 01-2 2h-1m0-4H9v4h2m2 0v.01"/>
+            </svg>
+          </span>
+          {{ form.password(class_="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:ring-emerald-600 focus:border-emerald-600") }}
+        </div>
+        <p class="text-xs text-gray-500 mt-2">
+          La contraseña debe tener al menos 8 caracteres, una mayúscula y terminar con un número.
+        </p>
+        {% for error in form.password.errors %}
+          <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Nombre -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Nombre</label>
+        {{ form.name(class_="w-full mt-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-emerald-600 focus:border-emerald-600") }}
+        {% for error in form.name.errors %}
+          <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Apellido -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Apellido</label>
+        {{ form.last_name(class_="w-full mt-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-emerald-600 focus:border-emerald-600") }}
+        {% for error in form.last_name.errors %}
+          <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Dirección -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Dirección</label>
+        {{ form.address(class_="w-full mt-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-emerald-600 focus:border-emerald-600") }}
+        {% for error in form.address.errors %}
+          <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Teléfono -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Teléfono</label>
+        {{ form.phone_number(class_="w-full mt-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-emerald-600 focus:border-emerald-600") }}
+        {% for error in form.phone_number.errors %}
+          <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Rol -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Rol</label>
+        {{ form.role(class_="w-full mt-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-emerald-600 focus:border-emerald-600") }}
+        {% for error in form.role.errors %}
+          <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Botón -->
+      <div class="pt-4 flex justify-center">
+        {{ form.submit(class_="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition font-semibold") }}
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

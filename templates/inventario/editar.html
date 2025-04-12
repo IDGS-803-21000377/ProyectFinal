@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+{% block container %}
+
+<div class="max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-lg bg-white">
+
+  <!-- Encabezado -->
+  <div class="bg-gradient-to-tr from-emerald-700 to-emerald-900 text-white py-6 px-8 text-center">
+    <h2 class="text-3xl font-bold">{{ action }} Producto Terminado</h2>
+    <p class="text-sm">Completa los campos para {{ action | lower }} un producto</p>
+  </div>
+
+  <!-- Formulario -->
+  <div class="p-8">
+    <form method="POST">
+      {{ form.hidden_tag() }}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Nombre -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Nombre del Producto</label>
+          {{ form.nombre(class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-principal focus:ring-principal") }}
+          {% for error in form.nombre.errors %}
+            <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <!-- Descripción -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Descripción</label>
+          {{ form.descripcion(class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-principal focus:ring-principal") }}
+          {% for error in form.descripcion.errors %}
+            <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <!-- Cantidad -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Cantidad</label>
+          {{ form.cantidad(class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-principal focus:ring-principal") }}
+          {% for error in form.cantidad.errors %}
+            <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <!-- Receta -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Receta Asociada</label>
+          {{ form.receta_id(class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-principal focus:ring-principal") }}
+          {% for error in form.receta_id.errors %}
+            <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Botón -->
+      <div class="mt-8 text-right">
+        <button type="submit" class="bg-principal text-white py-2 px-6 rounded-md hover:bg-emerald-800 transition">
+          {{ action }}
+        </button>
+        <a href="{{ url_for('inventario.listar_productos') }}" class="ml-4 text-sm text-gray-500 hover:text-gray-800">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

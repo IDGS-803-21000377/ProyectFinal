@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Error {{ code }} - {{ title }}</title>
+    <link rel="stylesheet" href="/static/dist/css/output.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.3.0/dist/flowbite.min.js"></script>
+</head>
+<body class="bg-green-50 flex items-center justify-center min-h-screen">
+    <div class="bg-white shadow-lg rounded-xl p-10 text-center max-w-md mx-auto">
+        <h1 class="text-7xl font-extrabold text-green-500">{{ code }}</h1>
+        <h2 class="text-2xl font-semibold mt-4 text-gray-700">{{ title }}</h2>
+        <p class="text-gray-600 mt-2">{{ message }}</p>
+
+        <a href="" class="mt-6 inline-block bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition">
+            Volver al inicio
+        </a>
+
+        <div class="mt-6 flex flex-wrap justify-center gap-2">
+            <span class="ingredient-chip bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm hover:shadow-md transition">Inicio</span>
+            <span class="ingredient-chip bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm hover:shadow-md transition">Soporte</span>
+            <span class="ingredient-chip bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm hover:shadow-md transition">Contacto</span>
+        </div>
+    </div>
+</body>
+</html>

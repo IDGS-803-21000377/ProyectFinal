@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block container %}
+    <h2 class="text-2xl font-semibold mb-4">Editar Material</h2>
+
+    <form method="POST" class="space-y-4">
+        {{ form.hidden_tag() }} 
+
+        <div class="form-group">
+            <label for="nombreProducto" class="block text-sm font-medium text-gray-700">Nombre del Producto</label>
+            {{ form.nombreProducto(class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500") }}
+        </div>
+
+        <div class="form-group">
+            <label for="cantidad_disponible" class="block text-sm font-medium text-gray-700">Cantidad Disponible</label>
+            {{ form.cantidad_disponible(class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500") }}
+        </div>
+
+        <div class="form-group">
+            <label for="precio_por_unidad" class="block text-sm font-medium text-gray-700">Precio por Unidad</label>
+            {{ form.precio_por_unidad(class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500") }}
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 bg-indigo-600 text-white rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                Guardar Cambios
+            </button>
+        </div>
+    </form>
+{% endblock %}
